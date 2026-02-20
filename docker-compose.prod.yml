@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tva_postgres
+    restart: always
+    environment:
+      POSTGRES_USER:     tva_user
+      POSTGRES_PASSWORD: tva_pass
+      POSTGRES_DB:       tva_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tva_user -d tva_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: tva_backend
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://tva_user:tva_pass@postgres:5432/tva_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: tva_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+    name: tva_postgres_data
