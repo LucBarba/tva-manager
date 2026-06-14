@@ -111,33 +111,35 @@ export const messageRepository = {
   /**
    * Marque comme "lus" tous les messages entrants non lus.
    * Met à jour le statut des messages et remet le compteur à zéro.
+   * (L'app étant à 2 utilisateurs, "entrant" = envoyé par `partnerId`.)
    */
-  async markIncomingAsRead({ conversationId, currentUserId }) {
-    const q = fs.query(
-      messagesCol(conversationId),
-      fs.where('senderId', '!=', currentUserId),
-      fs.where('status', 'in', [MessageStatus.sent, MessageStatus.delivered]),
-    )
-    const snap = await fs.getDocs(q)
-    if (snap.empty) {
-      await fs.updateDoc(fs.docRef(Collections.conversations, conversationId), {
+  async markIncomingAsRead({ conversationId, currentUserId, partnerId }) {
+    if (partnerId) {
+      const q = fs.query(
+        messagesCol(conversationId),
+        fs.where('senderId', '==', partnerId),
+        fs.where('status', 'in', [MessageStatus.sent, MessageStatus.delivered]),
+      )
+      const snap = await fs.getDocs(q)
+      const batch = fs.batch()
+      snap.docs.forEach((d) => batch.update(d.ref, { status: MessageStatus.read }))
+      batch.update(fs.docRef(Collections.conversations, conversationId), {
         [`unreadCounts.${currentUserId}`]: 0,
       })
+      await batch.commit()
       return
     }
-    const batch = fs.batch()
-    snap.docs.forEach((d) => batch.update(d.ref, { status: MessageStatus.read }))
-    batch.update(fs.docRef(Collections.conversations, conversationId), {
+    await fs.updateDoc(fs.docRef(Collections.conversations, conversationId), {
       [`unreadCounts.${currentUserId}`]: 0,
     })
-    await batch.commit()
   },
 
   /** Marque les messages entrants comme "reçus" (delivered). */
-  async markIncomingAsDelivered({ conversationId, currentUserId }) {
+  async markIncomingAsDelivered({ conversationId, partnerId }) {
+    if (!partnerId) return
     const q = fs.query(
       messagesCol(conversationId),
-      fs.where('senderId', '!=', currentUserId),
+      fs.where('senderId', '==', partnerId),
       fs.where('status', '==', MessageStatus.sent),
     )
     const snap = await fs.getDocs(q)

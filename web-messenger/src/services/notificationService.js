@@ -5,7 +5,15 @@
 //
 
 import { getToken, onMessage } from 'firebase/messaging'
-import { messagingPromise, vapidKey } from '../firebase/config'
+import { messagingPromise, vapidKey, firebaseConfig } from '../firebase/config'
+
+// Le service worker n'a pas accès aux variables Vite : on lui transmet la
+// configuration Firebase via les paramètres d'URL au moment de l'enregistrement.
+// Ainsi, l'utilisateur n'a qu'UN seul fichier à configurer (.env).
+function swUrlWithConfig() {
+  const params = new URLSearchParams(firebaseConfig).toString()
+  return `/firebase-messaging-sw.js?${params}`
+}
 
 export const notificationService = {
   /** Demande la permission et renvoie le jeton FCM (ou null). */
@@ -18,7 +26,7 @@ export const notificationService = {
     if (permission !== 'granted') return null
 
     try {
-      const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      const registration = await navigator.serviceWorker.register(swUrlWithConfig())
       const token = await getToken(messaging, {
         vapidKey,
         serviceWorkerRegistration: registration,

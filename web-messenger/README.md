@@ -196,8 +196,11 @@ cd web-messenger
 cp .env.example .env
 # Renseignez toutes les valeurs VITE_FIREBASE_* et VITE_FIREBASE_VAPID_KEY
 ```
-⚠️ Reportez **les mêmes valeurs** de config dans `public/firebase-messaging-sw.js`
-(le Service Worker n'a pas accès aux variables Vite).
+✅ Un seul fichier à configurer : le service worker FCM reçoit automatiquement la
+config via les paramètres d'URL (rien à éditer dans `public/firebase-messaging-sw.js`).
+
+> 👉 Guide détaillé pas à pas (création du projet Firebase, récupération des clés) :
+> voir **[SETUP.md](./SETUP.md)**.
 
 ### 4. Installer et lancer
 ```bash

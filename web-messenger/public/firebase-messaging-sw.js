@@ -2,35 +2,42 @@
  * firebase-messaging-sw.js
  * Service Worker pour les notifications Web Push en arrière-plan (FCM).
  *
- * IMPORTANT : un service worker n'a pas accès à import.meta.env. Renseignez
- * ci-dessous les MÊMES valeurs que dans votre fichier .env (config Firebase Web).
+ * La configuration Firebase est transmise automatiquement par l'application via
+ * les paramètres d'URL lors de l'enregistrement du service worker
+ * (voir src/services/notificationService.js). AUCUNE édition manuelle requise :
+ * il suffit de renseigner le fichier .env.
  */
 
 importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js')
 importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging-compat.js')
 
-firebase.initializeApp({
-  apiKey: 'REMPLACER_PAR_VITE_FIREBASE_API_KEY',
-  authDomain: 'REMPLACER_PAR_VITE_FIREBASE_AUTH_DOMAIN',
-  projectId: 'REMPLACER_PAR_VITE_FIREBASE_PROJECT_ID',
-  storageBucket: 'REMPLACER_PAR_VITE_FIREBASE_STORAGE_BUCKET',
-  messagingSenderId: 'REMPLACER_PAR_VITE_FIREBASE_MESSAGING_SENDER_ID',
-  appId: 'REMPLACER_PAR_VITE_FIREBASE_APP_ID',
-})
+// Lecture de la config depuis les paramètres d'URL du service worker.
+const params = new URL(self.location).searchParams
+const firebaseConfig = {
+  apiKey: params.get('apiKey'),
+  authDomain: params.get('authDomain'),
+  projectId: params.get('projectId'),
+  storageBucket: params.get('storageBucket'),
+  messagingSenderId: params.get('messagingSenderId'),
+  appId: params.get('appId'),
+}
 
-const messaging = firebase.messaging()
+if (firebaseConfig.projectId) {
+  firebase.initializeApp(firebaseConfig)
+  const messaging = firebase.messaging()
 
-// Notification reçue alors que l'application est en arrière-plan / fermée.
-messaging.onBackgroundMessage((payload) => {
-  const title = (payload.notification && payload.notification.title) || 'DuoChat'
-  const options = {
-    body: (payload.notification && payload.notification.body) || 'Nouveau message',
-    icon: '/favicon.svg',
-    badge: '/favicon.svg',
-    data: payload.data || {},
-  }
-  self.registration.showNotification(title, options)
-})
+  // Notification reçue alors que l'application est en arrière-plan / fermée.
+  messaging.onBackgroundMessage((payload) => {
+    const title = (payload.notification && payload.notification.title) || 'DuoChat'
+    const options = {
+      body: (payload.notification && payload.notification.body) || 'Nouveau message',
+      icon: '/favicon.svg',
+      badge: '/favicon.svg',
+      data: payload.data || {},
+    }
+    self.registration.showNotification(title, options)
+  })
+}
 
 // Focus / ouverture de l'onglet au clic sur la notification.
 self.addEventListener('notificationclick', (event) => {

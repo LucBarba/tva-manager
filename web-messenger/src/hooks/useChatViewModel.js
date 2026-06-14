@@ -78,9 +78,10 @@ export function useChatViewModel(currentUser) {
         }
 
         // Marquer reçus puis lus (l'écran est ouvert).
+        const partnerId = partner?.id
         messageRepository
-          .markIncomingAsDelivered({ conversationId, currentUserId })
-          .then(() => messageRepository.markIncomingAsRead({ conversationId, currentUserId }))
+          .markIncomingAsDelivered({ conversationId, partnerId })
+          .then(() => messageRepository.markIncomingAsRead({ conversationId, currentUserId, partnerId }))
           .catch(() => {})
       },
       (e) => setError(toUserMessage(e)),
