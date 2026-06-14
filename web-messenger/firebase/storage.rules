@@ -1,0 +1,57 @@
+rules_version = '2';
+
+// Règles de sécurité Firebase Storage pour DuoChat.
+// L'accès aux médias d'une conversation est réservé à ses participants
+// (vérifié via le document Firestore correspondant).
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Vrai si l'utilisateur courant participe à la conversation `cid`.
+    function isParticipant(cid) {
+      return isSignedIn()
+        && request.auth.uid in
+           firestore.get(/databases/(default)/documents/conversations/$(cid)).data.participants;
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    function isVideo() {
+      return request.resource.contentType.matches('video/.*');
+    }
+    function underSize(maxBytes) {
+      return request.resource.size < maxBytes;
+    }
+
+    // Photos de profil : lecture par tout utilisateur connecté, écriture par le propriétaire.
+    match /profile_images/{userId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn()
+                   && request.auth.uid == userId
+                   && isImage()
+                   && underSize(50 * 1024 * 1024);
+    }
+
+    // Images de chat.
+    match /chat_images/{cid}/{fileName} {
+      allow read: if isParticipant(cid);
+      allow write: if isParticipant(cid) && isImage() && underSize(50 * 1024 * 1024);
+    }
+
+    // Vidéos de chat.
+    match /chat_videos/{cid}/{fileName} {
+      allow read: if isParticipant(cid);
+      allow write: if isParticipant(cid) && isVideo() && underSize(50 * 1024 * 1024);
+    }
+
+    // Vignettes de vidéos.
+    match /chat_thumbnails/{cid}/{fileName} {
+      allow read: if isParticipant(cid);
+      allow write: if isParticipant(cid) && isImage() && underSize(10 * 1024 * 1024);
+    }
+  }
+}
