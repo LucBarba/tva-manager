@@ -1,0 +1,16 @@
+# Serveur Matter officiel (python-matter-server) pour DomoPi
+[Unit]
+Description=Matter Server (python-matter-server)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=__USER__
+WorkingDirectory=__PROJECT_DIR__
+ExecStart=__PROJECT_DIR__/.venv/bin/matter-server --storage-path __PROJECT_DIR__/data/matter
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

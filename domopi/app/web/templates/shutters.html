@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Volets – DomoPi{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3 mb-0"><i class="bi bi-window"></i> Volets roulants</h1>
+  <div class="btn-group">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shutter-modal"><i class="bi bi-plus-lg"></i> Volet</button>
+    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#group-modal"><i class="bi bi-collection"></i> Groupe</button>
+  </div>
+</div>
+
+<h2 class="h5 mb-3">Groupes</h2>
+<div class="row g-3 mb-4" id="group-cards"></div>
+
+<h2 class="h5 mb-3">Volets</h2>
+<div class="row g-3" id="shutter-list"></div>
+
+<!-- Modale : creation d'un volet -->
+<div class="modal fade" id="shutter-modal" tabindex="-1">
+  <div class="modal-dialog">
+    <form class="modal-content" id="shutter-form">
+      <div class="modal-header"><h5 class="modal-title">Nouveau volet</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Nom</label>
+          <input class="form-control" name="name" required maxlength="64"></div>
+        <div class="mb-3"><label class="form-label">Pièce</label>
+          <input class="form-control" name="room" maxlength="64"></div>
+        <div class="mb-3"><label class="form-label">Protocole</label>
+          <select class="form-select" name="protocol">
+            <option value="rf433">RF433 (codes appris)</option>
+            <option value="somfy_rts">Somfy RTS (rolling code)</option>
+          </select></div>
+        <div class="row">
+          <div class="col mb-3"><label class="form-label">Course (s)</label>
+            <input class="form-control" name="travel_time_s" type="number" value="20" min="1" max="120"></div>
+          <div class="col mb-3"><label class="form-label">Position favorite (%)</label>
+            <input class="form-control" name="favorite_position" type="number" value="50" min="0" max="100"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Créer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modale : creation d'un groupe -->
+<div class="modal fade" id="group-modal" tabindex="-1">
+  <div class="modal-dialog">
+    <form class="modal-content" id="group-form">
+      <div class="modal-header"><h5 class="modal-title">Nouveau groupe</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Nom</label>
+          <input class="form-control" name="name" required maxlength="64"></div>
+        <div class="mb-3"><label class="form-label">Volets membres</label>
+          <div id="group-shutter-checks"></div></div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Créer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modale : apprentissage RF433 -->
+<div class="modal fade" id="learn-modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Apprentissage télécommande</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <p>Choisir l'action puis appuyer sur le bouton correspondant de la télécommande
+           d'origine pendant la fenêtre d'écoute (15&nbsp;s).</p>
+        <div class="d-grid gap-2" id="learn-buttons">
+          <button class="btn btn-outline-primary" data-action="open"><i class="bi bi-chevron-up"></i> Ouverture</button>
+          <button class="btn btn-outline-primary" data-action="close"><i class="bi bi-chevron-down"></i> Fermeture</button>
+          <button class="btn btn-outline-primary" data-action="stop"><i class="bi bi-square"></i> Stop</button>
+          <button class="btn btn-outline-primary" data-action="favorite"><i class="bi bi-star"></i> Favori</button>
+        </div>
+        <div id="learn-status" class="alert alert-info mt-3 d-none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/shutters.js"></script>{% endblock %}

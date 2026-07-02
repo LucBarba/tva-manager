@@ -1,0 +1,29 @@
+# =============================================================================
+# DomoPi – docker-compose (OPTIONNEL)
+#
+# L'installation recommandee sur Raspberry Pi reste scripts/install.sh
+# (acces GPIO direct + mDNS simples). Ce compose est fourni pour lancer
+# le serveur Matter officiel en conteneur, et DomoPi en mode reseau hote
+# (necessaire pour HomeKit/mDNS et l'acces GPIO).
+# =============================================================================
+services:
+  matter-server:
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./data/matter:/data
+
+  domopi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    network_mode: host          # HomeKit (mDNS) + decouverte Hue
+    privileged: true            # acces GPIO (/dev/gpiomem, pigpiod)
+    depends_on:
+      - matter-server
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs

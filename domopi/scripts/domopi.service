@@ -1,0 +1,18 @@
+# Service systemd de DomoPi (installe par scripts/install.sh)
+[Unit]
+Description=DomoPi - systeme domotique Raspberry Pi
+After=network-online.target pigpiod.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=__USER__
+WorkingDirectory=__PROJECT_DIR__
+ExecStart=__PROJECT_DIR__/.venv/bin/python main.py
+Restart=on-failure
+RestartSec=5
+# Le pont HomeKit et mDNS ont besoin du reseau local
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target

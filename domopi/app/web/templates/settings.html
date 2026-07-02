@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Configuration – DomoPi{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4"><i class="bi bi-gear"></i> Configuration</h1>
+
+<div class="row g-4">
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-lightbulb"></i> Philips Hue</div>
+      <div class="card-body">
+        <p class="text-body-secondary">Appuyer sur le bouton central du pont Hue puis lancer l'appairage.</p>
+        <button id="hue-pair" class="btn btn-primary"><i class="bi bi-link-45deg"></i> Appairer le pont</button>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-cpu"></i> Matter</div>
+      <div class="card-body">
+        <form id="matter-form" class="d-flex gap-2">
+          <input class="form-control" id="pairing-code" placeholder="Code d'appairage (ex. 3497-011-2332)"
+                 required minlength="8" maxlength="48">
+          <button class="btn btn-primary" type="submit"><i class="bi bi-plus-lg"></i> Appairer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-people"></i> Utilisateurs</div>
+      <div class="card-body">
+        <table class="table table-sm"><tbody id="user-rows"></tbody></table>
+        <form id="user-form" class="row g-2">
+          <div class="col"><input class="form-control form-control-sm" name="username" placeholder="Utilisateur" required minlength="3" maxlength="64"></div>
+          <div class="col"><input class="form-control form-control-sm" name="password" type="password" placeholder="Mot de passe" required minlength="8" maxlength="128"></div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" name="role"><option value="user">Utilisateur</option><option value="admin">Admin</option></select>
+          </div>
+          <div class="col-auto"><button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-plus-lg"></i></button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header"><i class="bi bi-info-circle"></i> Système</div>
+      <div class="card-body"><dl class="row mb-0" id="system-info"></dl></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/js/settings.js"></script>{% endblock %}

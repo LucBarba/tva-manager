@@ -1,0 +1,51 @@
+/* ==========================================================================
+   DomoPi – styles de l'interface Web
+   Complements de Bootstrap 5 : cartes appareils, animations, mode sombre.
+   ========================================================================== */
+
+/* Carte de connexion */
+.login-card {
+  width: 100%;
+  max-width: 380px;
+}
+
+/* Cartes d'appareils du tableau de bord */
+.device-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.device-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+}
+
+/* Icone d'appareil */
+.device-icon {
+  font-size: 1.8rem;
+}
+
+/* Animation d'un volet en mouvement */
+@keyframes shutter-move {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.35; }
+  100% { opacity: 1; }
+}
+.shutter-moving .device-icon {
+  animation: shutter-move 1s ease-in-out infinite;
+}
+
+/* Ampoule allumee */
+.light-on .device-icon {
+  color: #ffc107;
+  text-shadow: 0 0 12px rgba(255, 193, 7, 0.6);
+}
+
+/* Grande valeur de capteur */
+.sensor-value {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+/* Barre de position du volet */
+.position-bar {
+  height: 6px;
+}
